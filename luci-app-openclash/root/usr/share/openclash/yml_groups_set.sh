@@ -7,7 +7,6 @@ status=$(unify_ps_status "yml_groups_set.sh")
 
 START_LOG="/tmp/openclash_start.log"
 GROUP_FILE="/tmp/yaml_groups.yaml"
-CONFIG_GROUP_FILE="/tmp/yaml_group.yaml"
 CFG_FILE="/etc/config/openclash"
 servers_update=$(uci get openclash.config.servers_update 2>/dev/null)
 CONFIG_FILE=$(uci get openclash.config.config_path 2>/dev/null)
@@ -83,7 +82,7 @@ yml_servers_add()
 	      config_list_foreach "$section" "groups" set_groups "$name" "$2"
      fi
 	   
-	   if [ ! -z "$if_game_group" ] && [ -z "$(grep -F $name /tmp/yaml_proxy.yaml)" ]; then
+	   if [ ! -z "$if_game_group" ] && [ -z "$(ruby -ryaml -E UTF-8 -e "Value = YAML.load_file('$CONFIG_FILE'); Value['proxies'].each{|x| if x['name'].eql?('$name') then puts x['name'] end}" 2>/dev/null)" ]; then
 	      /usr/share/openclash/yml_proxys_set.sh "$name" "proxy"
 	   fi
 	fi
@@ -120,7 +119,7 @@ set_proxy_provider()
 	      config_list_foreach "$section" "groups" set_provider_groups "$name" "$2"
      fi
 	   
-	   if [ ! -z "$if_game_group" ] && [ -z "$(grep "^ \{0,\}$name" /tmp/yaml_proxy_provider.yaml)" ]; then
+	   if [ ! -z "$if_game_group" ] && [ -z "$(ruby -ryaml -E UTF-8 -e "Value = YAML.load_file('$CONFIG_FILE'); Value['proxy-providers'].keys.each{|x| if x.eql?('$name') then puts x end}" 2>/dev/null)" ]; then
 	      /usr/share/openclash/yml_proxys_set.sh "$name" "proxy-provider"
 	   fi
 	fi
@@ -206,12 +205,7 @@ yml_groups_set()
    set_group=0
    set_proxy_provider=0
    
-   if [ "$type" = "select" ] || [ "$type" = "relay" ]; then
-      config_list_foreach "$section" "other_group" set_other_groups #加入其他策略组
-   else
-      config_list_foreach "$section" "other_group_dr" set_other_groups #仅加入direct/reject其他策略组
-   fi
-   
+   config_list_foreach "$section" "other_group" set_other_groups #加入其他策略组
    config_foreach yml_servers_add "servers" "$name" "$type" #加入服务器节点
    
    if [ "$type" = "relay" ] && [ -s "/tmp/relay_server" ]; then
