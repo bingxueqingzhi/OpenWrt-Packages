@@ -73,7 +73,7 @@ XHR.poll(4, '<%=build_url("admin/modem/data")%>', null,
 					var rfdl = 869;
 					var frul = 824;
 					var offset = 2400;
-					var band = "B5";
+					var band = "5";
 				} else if (rfcn >= 2750 && rfcn <= 3449) {
 					var frdl = 2620;
 					var frul = 2500;
@@ -94,10 +94,10 @@ XHR.poll(4, '<%=build_url("admin/modem/data")%>', null,
 					var frul = 462.5;
 					var offset = 9870;
 					var band = "31";
-				} else if (rfcn >= 33750 && rfcn <= 38249) {
+				} else if (rfcn >= 37750 && rfcn <= 38249) {
 					var frdl = 2570;
 					var frul = 2570;
-					var offset = 33750;
+					var offset = 37750;
 					var band = "38";
 				} else if (rfcn >= 38650 && rfcn <= 39649) {
 					var frdl = 2300;
@@ -183,7 +183,11 @@ XHR.poll(4, '<%=build_url("admin/modem/data")%>', null,
 				} else {
 					scc = "";
 					bcc = " B" + band;
-					bca = " (" + bw + " MHz)";
+					if (bw) {
+						bca = " (" + bw + " MHz)";
+					} else{
+						bca = ""
+					}
 					arfcn = data.arfcn + " " + bca;
 					freq = dlfreq + " / " + ulfreq + " MHz"
 				}
@@ -198,7 +202,7 @@ XHR.poll(4, '<%=build_url("admin/modem/data")%>', null,
 				var bcc = " " + band;
 				var freq = dlfreq + " / " + ulfreq + " MHz"
 				var arfcn = data.arfcn;
-				var lactac = data.lac + " / " + data.lac_num;
+				var lactac = data.lac + "  (" + data.lac_num + ")";
 				
 			} else {
 				var namech = "ARFCN";
@@ -207,7 +211,7 @@ XHR.poll(4, '<%=build_url("admin/modem/data")%>', null,
 				var bcc = " " + band;
 				var arfcn = data.arfcn;
 				var freq = dlfreq + " / " + ulfreq + " MHz"
-				var lactac = data.lac + " / " + data.lac_num;
+				var lactac = data.lac + " (" + data.lac_num + ")";
 			}
 
 			// stuff
